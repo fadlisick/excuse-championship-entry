@@ -25,6 +25,15 @@ def check(text):
         raise SystemExit("excuse has leading or trailing whitespace")
     if "\n" in text or "\r" in text:
         raise SystemExit("excuse must be a single line")
+    if "\u2014" in text:
+        raise SystemExit("excuse must not contain an em dash")
+
+
+def verify(target, text):
+    with open(target, "rb") as handle:
+        written = handle.read()
+    if written != text.encode("utf-8"):
+        raise SystemExit("entry.txt does not match the excuse byte for byte")
 
 
 def main():
@@ -32,6 +41,8 @@ def main():
     target = os.path.join(out_dir(), "entry.txt")
     with open(target, "w", encoding="utf-8", newline="") as handle:
         handle.write(EXCUSE)
+    os.chmod(target, 0o644)
+    verify(target, EXCUSE)
     print(f"wrote {len(EXCUSE)} chars to {target}")
     return 0
 
